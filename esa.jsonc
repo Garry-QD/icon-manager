@@ -1,0 +1,4 @@
+{
+  "entry": "dist/server/entry.mjs",
+  "assets": "dist/client"
+}
