@@ -11,7 +11,19 @@ export default defineConfig({
   integrations: [react()],
 
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    build: {
+      rollupOptions: {
+        external: [
+          'fs',
+          'path',
+          'node:fs',
+          'node:path',
+          'fs/promises',
+          'node:fs/promises'
+        ]
+      }
+    }
   },
 
   adapter: node({
