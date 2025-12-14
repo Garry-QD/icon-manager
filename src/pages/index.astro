@@ -174,20 +174,20 @@ const parsedIcons = icons.map((filename) => {
       <div id="grid" class="grid">
         {parsedIcons.map((icon) => (
           <div class="card" data-name={icon.name} data-cn={icon.cnName} data-domain={icon.domain} data-original={icon.original}>
-            <img src={`/icon/${icon.original}`} alt={icon.name} loading="lazy" />
+            <img src={`/icon/${encodeURIComponent(icon.original)}`} alt={icon.name} loading="lazy" />
             <div class="name">{icon.name}</div>
             {icon.cnName && <div class="cn">{icon.cnName}</div>}
             {icon.domain && <div class="domain">{icon.domain}</div>}
             <input
               class="path"
               readonly
-              value={`/icon/${icon.original}`}
+              value={`/icon/${encodeURIComponent(icon.original)}`}
             />
             <div class="actions">
               <button class="btn" data-action="copy">复制路径</button>
               <a
                 class="btn btn-primary"
-                href={`/icon/${icon.original}`}
+                href={`/icon/${encodeURIComponent(icon.original)}`}
                 download
               >
                 下载
