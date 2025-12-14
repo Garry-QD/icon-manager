@@ -20,7 +20,7 @@ const parsedIcons = icons.map((filename) => {
   const ext = dotIndex >= 0 ? filename.slice(dotIndex) : '';
   const nameWithoutExt = dotIndex >= 0 ? filename.slice(0, dotIndex) : filename;
 
-  const parts = nameWithoutExt.split('+');
+  const parts = nameWithoutExt.split('--');
   const name = parts[0] || nameWithoutExt;
   const cnName = parts[1] || '';
   const domain = parts[2] || '';
@@ -98,21 +98,20 @@ const parsedIcons = icons.map((filename) => {
         gap: 0.5rem;
       }
       .card img {
-        width: 48px;
-        height: 48px;
+        width: 64px;
+        height: 64px;
         object-fit: contain;
       }
       .name {
-        font-size: 0.875rem;
         font-weight: 600;
         text-align: center;
-        word-break: break-all;
+        word-break: break-word;
+        font-size: 0.875rem;
       }
       .cn {
         font-size: 0.75rem;
         color: #6b7280;
         text-align: center;
-        word-break: break-all;
       }
       .domain {
         font-size: 0.75rem;
@@ -121,16 +120,17 @@ const parsedIcons = icons.map((filename) => {
         word-break: break-all;
       }
       .path {
-        width: 100%;
         font-size: 0.75rem;
+        color: #9ca3af;
         background: #f9fafb;
-        border-radius: 0.5rem;
-        padding: 0.25rem 0.5rem;
         border: 1px solid #e5e7eb;
+        border-radius: 0.25rem;
+        padding: 0.25rem;
+        width: 100%;
         box-sizing: border-box;
+        font-family: monospace;
       }
       .actions {
-        margin-top: 0.25rem;
         display: flex;
         gap: 0.5rem;
         width: 100%;
@@ -138,16 +138,28 @@ const parsedIcons = icons.map((filename) => {
       .btn {
         flex: 1;
         font-size: 0.75rem;
-        padding: 0.25rem 0.5rem;
-        border-radius: 0.5rem;
-        border: 1px solid #d1d5db;
+        padding: 0.25rem;
+        border-radius: 0.25rem;
+        border: 1px solid #e5e7eb;
         background: white;
         cursor: pointer;
+        text-align: center;
+        text-decoration: none;
+        color: inherit;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      .btn:hover {
+        background: #f9fafb;
       }
       .btn-primary {
-        border-color: #2563eb;
         background: #2563eb;
         color: white;
+        border-color: #2563eb;
+      }
+      .btn-primary:hover {
+        background: #1d4ed8;
       }
       .empty {
         text-align: center;
@@ -174,20 +186,20 @@ const parsedIcons = icons.map((filename) => {
       <div id="grid" class="grid">
         {parsedIcons.map((icon) => (
           <div class="card" data-name={icon.name} data-cn={icon.cnName} data-domain={icon.domain} data-original={icon.original}>
-            <img src={`/icon/${encodeURIComponent(icon.original).replace(/%2B/g, '+')}`} alt={icon.name} loading="lazy" />
+            <img src={`/icon/${encodeURIComponent(icon.original)}`} alt={icon.name} loading="lazy" />
             <div class="name">{icon.name}</div>
             {icon.cnName && <div class="cn">{icon.cnName}</div>}
             {icon.domain && <div class="domain">{icon.domain}</div>}
             <input
               class="path"
               readonly
-              value={`/icon/${encodeURIComponent(icon.original).replace(/%2B/g, '+')}`}
+              value={`/icon/${encodeURIComponent(icon.original)}`}
             />
             <div class="actions">
               <button class="btn" data-action="copy">复制路径</button>
               <a
                 class="btn btn-primary"
-                href={`/icon/${encodeURIComponent(icon.original).replace(/%2B/g, '+')}`}
+                href={`/icon/${encodeURIComponent(icon.original)}`}
                 download
               >
                 下载
