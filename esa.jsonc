@@ -1,9 +1,10 @@
 {
   "name": "icon-manager",
-  "entry": "./src/edge.js",
+  "installCommand": "npm install",
   "buildCommand": "npm run build",
   "assets": {
     "directory": "./dist",
-    "notFoundStrategy": "singlePageApplication"
+    "notFoundStrategy": "404Page"
   }
 }
+

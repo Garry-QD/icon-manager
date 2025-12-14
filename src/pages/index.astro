@@ -1,22 +1,246 @@
 ---
-import IconManager from '../components/IconManager';
-import { getIcons } from '../utils/iconLoader';
+import fs from 'node:fs';
+import path from 'node:path';
 
-const icons = getIcons();
+const iconDir = path.join(process.cwd(), 'public', 'icon');
+
+let icons = [];
+if (fs.existsSync(iconDir)) {
+  icons = fs
+    .readdirSync(iconDir)
+    .filter((file) => {
+      const ext = path.extname(file).toLowerCase();
+      return ['.png', '.jpg', '.jpeg', '.svg', '.webp', '.gif'].includes(ext);
+    })
+    .sort();
+}
+
+const parsedIcons = icons.map((filename) => {
+  const dotIndex = filename.lastIndexOf('.');
+  const ext = dotIndex >= 0 ? filename.slice(dotIndex) : '';
+  const nameWithoutExt = dotIndex >= 0 ? filename.slice(0, dotIndex) : filename;
+
+  const parts = nameWithoutExt.split('+');
+  const name = parts[0] || nameWithoutExt;
+  const cnName = parts[1] || '';
+  const domain = parts[2] || '';
+
+  return {
+    original: filename,
+    name: name.replace(/_/g, ' '),
+    cnName,
+    domain,
+    ext
+  };
+});
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Icon Manager</title>
-	</head>
-	<body class="bg-gray-100 min-h-screen">
-    <div class="container mx-auto py-8">
-      <h1 class="text-3xl font-bold text-center mb-8">Icon Manager</h1>
-      <IconManager client:load icons={icons} />
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <title>图标管理器</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <style>
+      body {
+        margin: 0;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI',
+          sans-serif;
+        background: #f3f4f6;
+      }
+      .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1.5rem;
+      }
+      .header {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+      }
+      .title {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+      .search-input {
+        padding: 0.5rem 0.75rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        min-width: 260px;
+      }
+      .search-input:focus {
+        outline: none;
+        border-color: #2563eb;
+        box-shadow: 0 0 0 1px #2563eb33;
+      }
+      .badge {
+        font-size: 0.875rem;
+        background: #e5e7eb;
+        border-radius: 999px;
+        padding: 0.25rem 0.75rem;
+        color: #4b5563;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+        gap: 1rem;
+      }
+      .card {
+        background: white;
+        border-radius: 0.75rem;
+        padding: 0.75rem;
+        border: 1px solid #e5e7eb;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+      }
+      .card img {
+        width: 48px;
+        height: 48px;
+        object-fit: contain;
+      }
+      .name {
+        font-size: 0.875rem;
+        font-weight: 600;
+        text-align: center;
+        word-break: break-all;
+      }
+      .cn {
+        font-size: 0.75rem;
+        color: #6b7280;
+        text-align: center;
+        word-break: break-all;
+      }
+      .domain {
+        font-size: 0.75rem;
+        color: #9ca3af;
+        text-align: center;
+        word-break: break-all;
+      }
+      .path {
+        width: 100%;
+        font-size: 0.75rem;
+        background: #f9fafb;
+        border-radius: 0.5rem;
+        padding: 0.25rem 0.5rem;
+        border: 1px solid #e5e7eb;
+        box-sizing: border-box;
+      }
+      .actions {
+        margin-top: 0.25rem;
+        display: flex;
+        gap: 0.5rem;
+        width: 100%;
+      }
+      .btn {
+        flex: 1;
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.5rem;
+        border: 1px solid #d1d5db;
+        background: white;
+        cursor: pointer;
+      }
+      .btn-primary {
+        border-color: #2563eb;
+        background: #2563eb;
+        color: white;
+      }
+      .empty {
+        text-align: center;
+        color: #9ca3af;
+        margin-top: 3rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <div class="title">图标管理器</div>
+        <input
+          id="search"
+          class="search-input"
+          type="text"
+          placeholder="按名称 / 中文名 / 域名 搜索"
+        />
+        <div class="badge">
+          共 {parsedIcons.length} 个图标
+        </div>
+      </div>
+
+      <div id="grid" class="grid">
+        {parsedIcons.map((icon) => (
+          <div class="card" data-name={icon.name} data-cn={icon.cnName} data-domain={icon.domain} data-original={icon.original}>
+            <img src={`/icon/${icon.original}`} alt={icon.name} loading="lazy" />
+            <div class="name">{icon.name}</div>
+            {icon.cnName && <div class="cn">{icon.cnName}</div>}
+            {icon.domain && <div class="domain">{icon.domain}</div>}
+            <input
+              class="path"
+              readonly
+              value={`/icon/${icon.original}`}
+            />
+            <div class="actions">
+              <button class="btn" data-action="copy">复制路径</button>
+              <a
+                class="btn btn-primary"
+                href={`/icon/${icon.original}`}
+                download
+              >
+                下载
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {parsedIcons.length === 0 && (
+        <div class="empty">public/icon 目录下还没有任何图标</div>
+      )}
     </div>
-	</body>
+
+    <script>
+      const searchInput = document.getElementById('search');
+      const grid = document.getElementById('grid');
+      const cards = Array.from(grid.children);
+
+      function match(card, q) {
+        const name = card.dataset.name.toLowerCase();
+        const cn = card.dataset.cn.toLowerCase();
+        const domain = card.dataset.domain.toLowerCase();
+        const original = card.dataset.original.toLowerCase();
+        return (
+          name.includes(q) ||
+          cn.includes(q) ||
+          domain.includes(q) ||
+          original.includes(q)
+        );
+      }
+
+      searchInput.addEventListener('input', () => {
+        const q = searchInput.value.trim().toLowerCase();
+        cards.forEach((card) => {
+          if (!q || match(card, q)) {
+            card.style.display = '';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      });
+
+      grid.addEventListener('click', (e) => {
+        const btn = e.target;
+        if (btn.dataset.action === 'copy') {
+          const card = btn.closest('.card');
+          const input = card.querySelector('.path');
+          navigator.clipboard.writeText(input.value);
+          alert('已复制路径：' + input.value);
+        }
+      });
+    </script>
+  </body>
 </html>
+
